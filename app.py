@@ -25,6 +25,7 @@ except Exception as e:
 
 def get_feature_analysis(features):
     feature_names = [
+        "Lookalike Domain",
         "Using IP Address", "Long URL", "Short URL", "Symbol @", "Redirecting",
         "Prefix/Suffix", "Sub Domains", "HTTPS", "Domain Registration Length",
         "Favicon", "Non-Standard Port", "HTTPS Domain URL", "Request URL",
@@ -48,6 +49,11 @@ def get_feature_analysis(features):
 
 def get_feature_description(feature_name, value):
     descriptions = {
+        "Lookalike Domain": {
+            1: "Domain does not closely resemble a top brand domain.",
+            0: "Domain similarity is ambiguous.",
+            -1: "Domain closely resembles a top brand domain (potential phishing)."
+        },
         "Using IP Address": {
             1: "URL uses a domain name instead of an IP address",
             0: "URL uses an IP address directly, which is suspicious"
@@ -184,25 +190,98 @@ def index():
         try:
             url = request.form["url"]
             is_valid, error_message = validate_url(url)
-            
             if not is_valid:
+                if request.headers.get('Accept') == 'application/json':
+                    return jsonify({'error': error_message}), 400
                 flash(error_message, "error")
                 return render_template("index.html", xx=-1)
-            
             obj = FeatureExtraction(url)
             features = obj.getFeaturesList()
-            x = np.array(features).reshape(1,30)
-            
+            features_for_model = features[1:]  # skip the first feature
+            x = np.array(features_for_model).reshape(1, len(features_for_model))
             if gbc is None:
+                if request.headers.get('Accept') == 'application/json':
+                    return jsonify({'error': 'Model not loaded properly.'}), 500
                 flash("Model not loaded properly. Please contact administrator.", "error")
                 return render_template("index.html", xx=-1)
-            
             y_pred = gbc.predict(x)[0]
             y_pro_phishing = gbc.predict_proba(x)[0,0]
             y_pro_non_phishing = gbc.predict_proba(x)[0,1]
-            
-            # Calculate threat level (inverted logic)
-            threat_level = y_pro_non_phishing * 100  # Now using non-phishing probability
+            threat_level = y_pro_non_phishing * 100
+            feature_analysis = get_feature_analysis(features)
+            if features[0] == -1:
+                status = "danger"
+                prediction = "This URL closely resembles a top brand domain and is likely a phishing attempt."
+                display_score = 0
+            else:
+                if threat_level > 70:
+                    status = "safe"
+                    prediction = f"This URL appears to be safe ({threat_level:.2f}% confidence)"
+                elif threat_level > 30:
+                    status = "warning"
+                    prediction = f"Exercise caution with this URL ({threat_level:.2f}% confidence)"
+                else:
+                    status = "danger"
+                    prediction = f"This URL appears to be unsafe ({threat_level:.2f}% confidence)"
+                display_score = round(threat_level)
+            if 'scan_history' not in session:
+                session['scan_history'] = []
+            scan_entry = {
+                'url': url,
+                'status': status,
+                'score': display_score,
+                'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                'features': feature_analysis
+            }
+            session['scan_history'] = [scan_entry] + session['scan_history'][:19]
+            session.modified = True
+            if request.headers.get('Accept') == 'application/json':
+                return jsonify({
+                    'url': url,
+                    'status': status,
+                    'score': display_score,
+                    'prediction': prediction,
+                    'feature_analysis': feature_analysis,
+                    'scan_history': session.get('scan_history', [])
+                })
+            return render_template('index.html', 
+                                xx=display_score/100, 
+                                url=url, 
+                                prediction=prediction,
+                                threat_level=threat_level,
+                                status=status,
+                                feature_analysis=feature_analysis,
+                                scan_history=session.get('scan_history', []))
+        except Exception as e:
+            if request.headers.get('Accept') == 'application/json':
+                return jsonify({'error': str(e)}), 500
+            flash(f"An error occurred: {str(e)}", "error")
+            return render_template("index.html", xx=-1)
+    return render_template("index.html", xx=-1, scan_history=session.get('scan_history', []))
+
+@app.route("/analyze", methods=["POST"])
+def analyze():
+    try:
+        url = request.form["url"]
+        is_valid, error_message = validate_url(url)
+        if not is_valid:
+            return jsonify({'error': error_message}), 400
+        obj = FeatureExtraction(url)
+        features = obj.getFeaturesList()
+        features_for_model = features[1:]  # skip the first feature
+        x = np.array(features_for_model).reshape(1, len(features_for_model))
+        if gbc is None:
+            return jsonify({'error': 'Model not loaded properly.'}), 500
+        y_pred = gbc.predict(x)[0]
+        y_pro_phishing = gbc.predict_proba(x)[0,0]
+        y_pro_non_phishing = gbc.predict_proba(x)[0,1]
+        threat_level = y_pro_non_phishing * 100
+        feature_analysis = get_feature_analysis(features)
+        if features[0] == -1:
+            status = "danger"
+            prediction = "This URL closely resembles a top brand domain and is likely a phishing attempt."
+            display_score = 0
+        else:
             if threat_level > 70:
                 status = "safe"
                 prediction = f"This URL appears to be safe ({threat_level:.2f}% confidence)"
@@ -212,38 +291,28 @@ def index():
             else:
                 status = "danger"
                 prediction = f"This URL appears to be unsafe ({threat_level:.2f}% confidence)"
-            
-            # Get feature analysis
-            feature_analysis = get_feature_analysis(features)
-            
-            # Store scan history in session
-            if 'scan_history' not in session:
-                session['scan_history'] = []
-            
-            scan_entry = {
-                'url': url,
-                'status': status,
-                'score': round(threat_level),
-                'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-                'features': feature_analysis
-            }
-            
-            session['scan_history'] = [scan_entry] + session['scan_history'][:19]  # Keep last 20 scans
-            session.modified = True
-            
-            return render_template('index.html', 
-                                xx=round(threat_level/100,2), 
-                                url=url, 
-                                prediction=prediction,
-                                threat_level=threat_level,
-                                status=status,
-                                feature_analysis=feature_analysis,
-                                scan_history=session.get('scan_history', []))
-        except Exception as e:
-            flash(f"An error occurred: {str(e)}", "error")
-            return render_template("index.html", xx=-1)
-    
-    return render_template("index.html", xx=-1, scan_history=session.get('scan_history', []))
+            display_score = round(threat_level)
+        if 'scan_history' not in session:
+            session['scan_history'] = []
+        scan_entry = {
+            'url': url,
+            'status': status,
+            'score': display_score,
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'features': feature_analysis
+        }
+        session['scan_history'] = [scan_entry] + session['scan_history'][:19]
+        session.modified = True
+        return jsonify({
+            'url': url,
+            'status': status,
+            'score': display_score,
+            'prediction': prediction,
+            'feature_analysis': feature_analysis,
+            'scan_history': session.get('scan_history', [])
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route("/clear-history", methods=["POST"])
 def clear_history():

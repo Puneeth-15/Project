@@ -11,6 +11,7 @@ import time
 from dateutil.parser import parse as date_parse
 from urllib.parse import urlparse
 import urllib3
+import difflib
 
 # Disable SSL warnings
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -43,6 +44,7 @@ class FeatureExtraction:
         except:
             pass
 
+        self.features.append(self.lookalikeDomain())
         self.features.append(self.UsingIp())
         self.features.append(self.longUrl())
         self.features.append(self.shortUrl())
@@ -73,6 +75,36 @@ class FeatureExtraction:
         self.features.append(self.GoogleIndex())
         self.features.append(self.LinksPointingToPage())
         self.features.append(self.StatsReport())
+
+    def lookalikeDomain(self):
+        # List of top domains to compare against
+        top_domains = [
+            'google.com', 'facebook.com', 'youtube.com', 'twitter.com', 'instagram.com',
+            'linkedin.com', 'wikipedia.org', 'yahoo.com', 'amazon.com', 'apple.com',
+            'microsoft.com', 'netflix.com', 'paypal.com', 'github.com', 'whatsapp.com'
+        ]
+        def levenshtein(a, b):
+            if len(a) < len(b):
+                return levenshtein(b, a)
+            if len(b) == 0:
+                return len(a)
+            previous_row = range(len(b) + 1)
+            for i, c1 in enumerate(a):
+                current_row = [i + 1]
+                for j, c2 in enumerate(b):
+                    insertions = previous_row[j + 1] + 1
+                    deletions = current_row[j] + 1
+                    substitutions = previous_row[j] + (c1 != c2)
+                    current_row.append(min(insertions, deletions, substitutions))
+                previous_row = current_row
+            return previous_row[-1]
+        domain = self.domain.lower().replace('www.', '')
+        for top in top_domains:
+            if domain == top:
+                return 1
+            if levenshtein(domain, top) <= 2:
+                return -1
+        return 1
 
     def UsingIp(self):
         try:
