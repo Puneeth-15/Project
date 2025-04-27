@@ -7,49 +7,99 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #6B8DD6 0%, #4A90E2 50%, #357ABD 100%);
+            --card-bg: rgba(255, 255, 255, 0.98);
+            --text-color: #2C3E50;
+            --border-radius: 20px;
+            --safe-color: #4CAF50;
+            --warning-color: #FFA726;
+            --danger-color: #EF5350;
+            --input-bg: rgba(255, 255, 255, 0.95);
+            --hover-bg: rgba(0, 0, 0, 0.02);
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --border-color: #E0E0E0;
+        }
+
+        [data-theme="dark"] {
+            --primary-gradient: linear-gradient(135deg, #23283a 0%, #181c24 100%);
+            --card-bg: #23283a;
+            --text-color: #e0e6ed;
+            --input-bg: #23283a;
+            --hover-bg: rgba(255,255,255,0.03);
+            --shadow-color: rgba(0,0,0,0.5);
+            --border-color: #31364a;
+            --safe-color: #7ed6a7;
+            --warning-color: #ffe082;
+            --danger-color: #ff7675;
+        }
+
         body {
-            background: linear-gradient(135deg, #1a2a6c 0%, #b21f1f 50%, #fdbb2d 100%);
+            background: var(--primary-gradient);
             min-height: 100vh;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #333;
+            color: var(--text-color);
+            transition: all 0.3s ease;
         }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .navbar-brand {
+            font-weight: 600;
+            font-size: 1.5rem;
+            color: var(--text-color);
+        }
+
         .container {
-            max-width: 900px;
-            margin-top: 50px;
+            max-width: 1200px;
+            margin-top: 30px;
         }
+
         .card {
-            border-radius: 20px;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
-            background: rgba(255, 255, 255, 0.95);
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 20px var(--shadow-color);
+            background: var(--card-bg);
             backdrop-filter: blur(10px);
             border: none;
+            transition: all 0.3s ease;
         }
+
         .card-header {
-            background: linear-gradient(135deg, #1a2a6c 0%, #b21f1f 100%);
+            background: var(--primary-gradient);
             color: white;
-            border-radius: 20px 20px 0 0 !important;
+            border-radius: var(--border-radius) var(--border-radius) 0 0 !important;
             padding: 25px;
             text-align: center;
         }
+
         .card-header h2 {
             font-size: 2.5rem;
-            font-weight: 700;
+            font-weight: 600;
             margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
         }
+
         .form-control {
             border-radius: 15px;
             padding: 15px;
-            border: 2px solid #e0e0e0;
+            border: 2px solid var(--border-color);
             transition: all 0.3s ease;
             font-size: 1.1rem;
+            background: var(--input-bg);
+            color: var(--text-color);
         }
+
         .form-control:focus {
-            border-color: #1a2a6c;
-            box-shadow: 0 0 0 0.2rem rgba(26,42,108,0.25);
+            border-color: #4A90E2;
+            box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
         }
+
         .btn-primary {
-            background: linear-gradient(135deg, #1a2a6c 0%, #b21f1f 100%);
+            background: var(--primary-gradient);
             border: none;
             border-radius: 15px;
             padding: 15px 35px;
@@ -57,85 +107,184 @@
             font-size: 1.1rem;
             transition: all 0.3s ease;
         }
+
         .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(26,42,108,0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(74, 144, 226, 0.3);
         }
+
         .result-card {
             margin-top: 30px;
             display: none;
         }
+
         .threat-meter {
             height: 25px;
             border-radius: 15px;
-            background: #e9ecef;
+            background: var(--border-color);
             margin: 15px 0;
             overflow: hidden;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: inset 0 2px 4px var(--shadow-color);
+            position: relative;
         }
+
         .threat-level {
             height: 100%;
             transition: width 0.8s ease;
+            position: relative;
         }
-        .safe {
-            background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
+
+        .threat-level::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 2px;
+            height: 100%;
+            background: var(--text-color);
+            opacity: 0.3;
         }
-        .warning {
-            background: linear-gradient(90deg, #ffc107 0%, #ff9800 100%);
+
+        .threat-indicators {
+            position: absolute;
+            top: -25px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 10px;
         }
-        .danger {
-            background: linear-gradient(90deg, #dc3545 0%, #c82333 100%);
+
+        .threat-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--border-color);
+            position: relative;
         }
+
+        .threat-indicator::before {
+            content: attr(data-label);
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            font-size: 0.8rem;
+            color: var(--text-color);
+        }
+
+        .threat-indicator.active {
+            background: var(--text-color);
+        }
+
+        .threat-details {
+            margin-top: 30px;
+            padding: 15px;
+            background: var(--hover-bg);
+            border-radius: 15px;
+        }
+
+        .threat-details h6 {
+            margin-bottom: 10px;
+            color: var(--text-color);
+        }
+
+        .threat-details p {
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            color: var(--text-color);
+            opacity: 0.8;
+        }
+
+        .real-time-updates {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px var(--shadow-color);
+            z-index: 1000;
+            display: none;
+        }
+
+        .real-time-updates.active {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .safe { background: linear-gradient(90deg, var(--safe-color) 0%, #66BB6A 100%); }
+        .warning { background: linear-gradient(90deg, var(--warning-color) 0%, #FFB74D 100%); }
+        .danger { background: linear-gradient(90deg, var(--danger-color) 0%, #E57373 100%); }
+
         .feature-list {
             max-height: 400px;
             overflow-y: auto;
             padding: 15px;
-            background: rgba(0,0,0,0.02);
+            background: var(--hover-bg);
             border-radius: 15px;
         }
+
         .feature-item {
             padding: 12px;
-            border-bottom: 1px solid #e0e0e0;
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
             transition: all 0.3s ease;
         }
+
         .feature-item:hover {
-            background: rgba(0,0,0,0.03);
+            background: var(--hover-bg);
             transform: translateX(5px);
         }
-        .feature-item:last-child {
-            border-bottom: none;
-        }
+
         .loading {
             display: none;
             text-align: center;
             padding: 30px;
         }
+
         .spinner-border {
             width: 4rem;
             height: 4rem;
-            color: #1a2a6c;
+            color: #4A90E2;
         }
+
         .alert {
             border-radius: 15px;
             margin-top: 20px;
             padding: 15px;
             font-size: 1.1rem;
         }
+
         .url-details {
-            background: rgba(0,0,0,0.02);
+            background: var(--hover-bg);
             padding: 20px;
             border-radius: 15px;
             margin-bottom: 20px;
         }
+
         .url-details p {
             margin-bottom: 10px;
             font-size: 1.1rem;
         }
+
         .url-details strong {
-            color: #1a2a6c;
+            color: #4A90E2;
         }
+
         .feature-icon {
             width: 30px;
             height: 30px;
@@ -145,18 +294,11 @@
             border-radius: 50%;
             margin-right: 15px;
         }
-        .feature-icon.safe {
-            background: rgba(40, 167, 69, 0.1);
-            color: #28a745;
-        }
-        .feature-icon.warning {
-            background: rgba(255, 193, 7, 0.1);
-            color: #ffc107;
-        }
-        .feature-icon.danger {
-            background: rgba(220, 53, 69, 0.1);
-            color: #dc3545;
-        }
+
+        .feature-icon.safe { background: rgba(76, 175, 80, 0.1); color: var(--safe-color); }
+        .feature-icon.warning { background: rgba(255, 167, 38, 0.1); color: var(--warning-color); }
+        .feature-icon.danger { background: rgba(239, 83, 80, 0.1); color: var(--danger-color); }
+
         .prediction-badge {
             display: inline-block;
             padding: 8px 15px;
@@ -164,21 +306,189 @@
             font-weight: 600;
             margin-top: 10px;
         }
-        .prediction-badge.safe {
-            background: rgba(40, 167, 69, 0.1);
-            color: #28a745;
+
+        .prediction-badge.safe { background: rgba(76, 175, 80, 0.1); color: var(--safe-color); }
+        .prediction-badge.warning { background: rgba(255, 167, 38, 0.1); color: var(--warning-color); }
+        .prediction-badge.danger { background: rgba(239, 83, 80, 0.1); color: var(--danger-color); }
+
+        .history-section {
+            margin-top: 30px;
         }
-        .prediction-badge.warning {
-            background: rgba(255, 193, 7, 0.1);
-            color: #ffc107;
+
+        .history-item {
+            background: var(--input-bg);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+            cursor: pointer;
         }
-        .prediction-badge.danger {
-            background: rgba(220, 53, 69, 0.1);
-            color: #dc3545;
+
+        .history-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px var(--shadow-color);
+        }
+
+        .history-details {
+            display: none;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .history-details.active {
+            display: block;
+        }
+
+        .analysis-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--border-color);
+            z-index: 1000;
+        }
+
+        .analysis-progress-bar {
+            height: 100%;
+            background: var(--primary-gradient);
+            transition: width 0.3s ease;
+        }
+
+        .analysis-step {
+            display: none;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: var(--hover-bg);
+            border-radius: 10px;
+        }
+
+        .analysis-step.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .theme-toggle {
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+        }
+
+        .threat-analysis {
+            background: var(--hover-bg);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+
+        .threat-analysis h5 {
+            color: var(--text-color);
+            margin-bottom: 15px;
+        }
+
+        .threat-analysis ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .threat-analysis li {
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .threat-analysis li:last-child {
+            border-bottom: none;
+        }
+
+        .threat-analysis .safe-point {
+            color: var(--safe-color);
+        }
+
+        .threat-analysis .warning-point {
+            color: var(--warning-color);
+        }
+
+        .threat-analysis .danger-point {
+            color: var(--danger-color);
+        }
+
+        .stats-card {
+            background: var(--hover-bg);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+
+        .stats-card h5 {
+            color: var(--text-color);
+            margin-bottom: 15px;
+        }
+
+        .stats-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .stats-item:last-child {
+            border-bottom: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin-top: 20px;
+            }
+            .card-header h2 {
+                font-size: 2rem;
+            }
+            .btn-primary {
+                width: 100%;
+                margin-top: 10px;
+            }
         }
     </style>
 </head>
 <body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-shield-alt me-2"></i>Phishing URL Detector
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#aboutModal">
+                            <i class="fas fa-info-circle me-1"></i>About
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="themeToggle">
+                            <i class="fas fa-moon me-1"></i>Dark Mode
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
     <div class="container">
         <div class="card">
             <div class="card-header">
@@ -202,6 +512,7 @@
                                 <i class="fas fa-search me-2"></i>Analyze URL
                             </button>
                         </div>
+                        <small class="text-muted mt-2 d-block">Enter a complete URL including http:// or https://</small>
                     </div>
                 </form>
 
@@ -230,13 +541,72 @@
                             <div class="mb-4">
                                 <h5>Threat Level</h5>
                                 <div class="threat-meter">
+                                    <div class="threat-indicators">
+                                        <div class="threat-indicator" data-label="Safe"></div>
+                                        <div class="threat-indicator" data-label="Low Risk"></div>
+                                        <div class="threat-indicator" data-label="Medium Risk"></div>
+                                        <div class="threat-indicator" data-label="High Risk"></div>
+                                        <div class="threat-indicator" data-label="Critical"></div>
+                                    </div>
                                     <div class="threat-level {{ status }}" 
                                          style="width: {{ (xx * 100)|round }}%"></div>
                                 </div>
-                                <div class="d-flex justify-content-between mt-2">
-                                    <span>Safe</span>
-                                    <span>Warning</span>
-                                    <span>Danger</span>
+                                <div class="threat-details">
+                                    <h6>Threat Assessment</h6>
+                                    {% if status == 'safe' %}
+                                        <p>✓ URL appears to be safe with strong security measures</p>
+                                        <p>✓ No suspicious patterns detected</p>
+                                        <p>✓ Domain and SSL certificate are valid</p>
+                                    {% elif status == 'warning' %}
+                                        <p>⚠ Some security concerns detected</p>
+                                        <p>⚠ Exercise caution with this URL</p>
+                                        <p>⚠ Consider additional verification</p>
+                                    {% else %}
+                                        <p>⚠ High risk of phishing detected</p>
+                                        <p>⚠ Multiple suspicious patterns found</p>
+                                        <p>⚠ Strongly recommend avoiding this URL</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="threat-analysis">
+                                <h5>Threat Analysis</h5>
+                                <ul>
+                                    {% for feature in feature_analysis %}
+                                    <li class="{{ feature.status }}-point">
+                                        <i class="fas {% if feature.status == 'safe' %}fa-check-circle{% elif feature.status == 'warning' %}fa-exclamation-circle{% else %}fa-times-circle{% endif %} me-2"></i>
+                                        <strong>{{ feature.name }}:</strong> 
+                                        {% if feature.status == 'safe' %}
+                                            This feature indicates the URL is safe
+                                        {% elif feature.status == 'warning' %}
+                                            This feature requires attention
+                                        {% else %}
+                                            This feature suggests potential phishing
+                                        {% endif %}
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+
+                            <div class="stats-card">
+                                <h5>Security Statistics</h5>
+                                <div class="stats-item">
+                                    <span>HTTPS Protocol</span>
+                                    <span class="{{ 'safe' if 'HTTPS' in feature_analysis|map(attribute='name')|list else 'danger' }}">
+                                        {{ 'Present' if 'HTTPS' in feature_analysis|map(attribute='name')|list else 'Missing' }}
+                                    </span>
+                                </div>
+                                <div class="stats-item">
+                                    <span>Domain Age</span>
+                                    <span class="{{ 'safe' if 'Age of Domain' in feature_analysis|map(attribute='name')|list else 'warning' }}">
+                                        {{ 'Verified' if 'Age of Domain' in feature_analysis|map(attribute='name')|list else 'Unknown' }}
+                                    </span>
+                                </div>
+                                <div class="stats-item">
+                                    <span>SSL Certificate</span>
+                                    <span class="{{ 'safe' if 'HTTPS Domain URL' in feature_analysis|map(attribute='name')|list else 'danger' }}">
+                                        {{ 'Valid' if 'HTTPS Domain URL' in feature_analysis|map(attribute='name')|list else 'Invalid' }}
+                                    </span>
                                 </div>
                             </div>
 
@@ -248,7 +618,10 @@
                                         <div class="feature-icon {{ feature.status }}">
                                             <i class="fas {% if feature.status == 'safe' %}fa-check-circle{% elif feature.status == 'warning' %}fa-exclamation-circle{% else %}fa-times-circle{% endif %}"></i>
                                         </div>
-                                        <span>{{ feature.name }}</span>
+                                        <div>
+                                            <strong>{{ feature.name }}</strong>
+                                            <p class="mb-0 text-muted">{{ feature.value }}</p>
+                                        </div>
                                     </div>
                                     {% endfor %}
                                 </div>
@@ -257,21 +630,191 @@
                     </div>
                 </div>
                 {% endif %}
+
+                <div class="history-section">
+                    <h4 class="mb-3">Recent Scans</h4>
+                    <div id="scanHistory">
+                        {% for scan in scan_history %}
+                        <div class="history-item" onclick="toggleHistoryDetails(this)">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>{{ scan.url }}</strong>
+                                    <div class="prediction-badge {{ scan.status }}">{{ scan.score }}% Safe</div>
+                                </div>
+                                <small class="text-muted">{{ scan.timestamp }}</small>
+                            </div>
+                            <div class="history-details">
+                                <div class="threat-meter mb-3">
+                                    <div class="threat-level {{ scan.status }}" 
+                                         style="width: {{ scan.score }}%"></div>
+                                </div>
+                                <div class="feature-list">
+                                    {% for feature in scan.features %}
+                                    <div class="feature-item">
+                                        <div class="feature-icon {{ feature.status }}">
+                                            <i class="fas {% if feature.status == 'safe' %}fa-check-circle{% elif feature.status == 'warning' %}fa-exclamation-circle{% else %}fa-times-circle{% endif %}"></i>
+                                        </div>
+                                        <div>
+                                            <strong>{{ feature.name }}</strong>
+                                            <p class="mb-0 text-muted">{{ feature.description }}</p>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="real-time-updates" id="realTimeUpdates">
+        <div class="d-flex align-items-center">
+            <div class="spinner-border spinner-border-sm me-2" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <span>Analyzing URL in real-time...</span>
+        </div>
+    </div>
+
+    <div class="analysis-progress">
+        <div class="analysis-progress-bar" id="analysisProgress"></div>
+    </div>
+
+    <!-- About Modal -->
+    <div class="modal fade" id="aboutModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">About Phishing URL Detector</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>This tool helps you identify potentially malicious URLs by analyzing various features and patterns commonly associated with phishing attempts.</p>
+                    <p>Features analyzed include:</p>
+                    <ul>
+                        <li>URL structure and length</li>
+                        <li>Domain characteristics</li>
+                        <li>Security indicators</li>
+                        <li>Website behavior patterns</li>
+                    </ul>
+                    <p>For more information about phishing prevention, visit our <a href="#" target="_blank">security guidelines</a>.</p>
+                </div>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.getElementById('urlForm').addEventListener('submit', function() {
-            document.querySelector('.loading').style.display = 'block';
-            document.getElementById('resultCard').style.display = 'none';
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+        
+        themeToggle.addEventListener('click', () => {
+            body.setAttribute('data-theme', 
+                body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'
+            );
+            themeToggle.innerHTML = body.getAttribute('data-theme') === 'dark' 
+                ? '<i class="fas fa-sun me-1"></i>Light Mode' 
+                : '<i class="fas fa-moon me-1"></i>Dark Mode';
         });
 
-        {% if xx != -1 %}
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('resultCard').style.display = 'block';
+        // Form submission handling
+        const form = document.getElementById('urlForm');
+        const loading = document.querySelector('.loading');
+        const resultCard = document.getElementById('resultCard');
+
+        // Real-time threat meter updates
+        function updateThreatMeter(score) {
+            const indicators = document.querySelectorAll('.threat-indicator');
+            const activeIndex = Math.floor(score / 20);
+            
+            indicators.forEach((indicator, index) => {
+                if (index <= activeIndex) {
+                    indicator.classList.add('active');
+                } else {
+                    indicator.classList.remove('active');
+                }
+            });
+        }
+
+        // Toggle history details
+        function toggleHistoryDetails(element) {
+            const details = element.querySelector('.history-details');
+            details.classList.toggle('active');
+        }
+
+        // Analysis progress
+        function updateAnalysisProgress(progress) {
+            const progressBar = document.getElementById('analysisProgress');
+            progressBar.style.width = `${progress}%`;
+        }
+
+        // Form submission handling with real-time updates
+        form.addEventListener('submit', () => {
+            loading.style.display = 'block';
+            if (resultCard) {
+                resultCard.style.display = 'none';
+            }
+            
+            // Show real-time updates
+            const realTimeUpdates = document.getElementById('realTimeUpdates');
+            realTimeUpdates.classList.add('active');
+            
+            // Simulate real-time analysis
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 5;
+                if (progress <= 100) {
+                    updateThreatMeter(progress);
+                    updateAnalysisProgress(progress);
+                } else {
+                    clearInterval(interval);
+                    realTimeUpdates.classList.remove('active');
+                }
+            }, 100);
         });
+
+        // Add to history with detailed features
+        function addToHistory(url, status, score, features) {
+            const historyDiv = document.getElementById('scanHistory');
+            const historyItem = document.createElement('div');
+            historyItem.className = 'history-item';
+            historyItem.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>${url}</strong>
+                        <div class="prediction-badge ${status}">${score}% Safe</div>
+                    </div>
+                    <small class="text-muted">${new Date().toLocaleTimeString()}</small>
+                </div>
+                <div class="history-details">
+                    <div class="threat-meter mb-3">
+                        <div class="threat-level ${status}" style="width: ${score}%"></div>
+                    </div>
+                    <div class="feature-list">
+                        ${features.map(feature => `
+                            <div class="feature-item">
+                                <div class="feature-icon ${feature.status}">
+                                    <i class="fas ${feature.status === 'safe' ? 'fa-check-circle' : feature.status === 'warning' ? 'fa-exclamation-circle' : 'fa-times-circle'}"></i>
+                                </div>
+                                <div>
+                                    <strong>${feature.name}</strong>
+                                    <p class="mb-0 text-muted">${feature.description}</p>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            historyDiv.insertBefore(historyItem, historyDiv.firstChild);
+        }
+
+        // Update threat meter for existing results
+        {% if xx != -1 %}
+        updateThreatMeter({{ (xx * 100)|round }});
         {% endif %}
     </script>
 </body>
