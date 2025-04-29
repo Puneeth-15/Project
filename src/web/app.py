@@ -1,3 +1,13 @@
+"""
+Phishing URL Detection Web Application
+
+A Flask-based web application that provides a user interface for the phishing URL
+detection system. It allows users to input URLs and get real-time analysis results.
+
+Author: [Your Name]
+Date: [Current Date]
+"""
+
 #importing required libraries
 
 from flask import Flask, request, render_template, flash, jsonify, session
@@ -186,6 +196,7 @@ def validate_url(url):
 
 @app.route("/", methods=["GET", "POST"])
 def index():
+    """Render the home page."""
     if request.method == "POST":
         try:
             url = request.form["url"]
@@ -261,6 +272,12 @@ def index():
 
 @app.route("/analyze", methods=["POST"])
 def analyze():
+    """
+    Analyze a URL for potential phishing attempts.
+    
+    Returns:
+        JSON response containing analysis results and confidence score
+    """
     try:
         url = request.form["url"]
         is_valid, error_message = validate_url(url)
@@ -319,5 +336,19 @@ def clear_history():
     session.pop('scan_history', None)
     return jsonify({"status": "success"})
 
-if __name__ == "__main__":
+@app.route('/about')
+def about():
+    """Render the about page."""
+    return render_template('about.html')
+
+@app.route('/contact')
+def contact():
+    """Render the contact page."""
+    return render_template('contact.html')
+
+def main():
+    """Run the Flask application."""
     app.run(debug=True, host='0.0.0.0', port=5000)
+
+if __name__ == "__main__":
+    main()
