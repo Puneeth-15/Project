@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Phishing URL Detector
 
 A machine learning-based web application that detects potential phishing URLs using various features and provides a detailed analysis.
@@ -14,7 +13,6 @@ A machine learning-based web application that detects potential phishing URLs us
 # Phishing URL Detection System
 
 A comprehensive system for detecting phishing URLs using machine learning techniques. This project implements various algorithms to analyze URL characteristics and identify potential phishing attempts.
->>>>>>> 4da7570d1042c349eb028889f9d601d42ec196bd
 
 ## Project Structure
 
@@ -71,12 +69,11 @@ source .venv/bin/activate  # Windows: .venv\Scripts\activate
 ```
 
 2. Install required packages:
->>>>>>> 4da7570d1042c349eb028889f9d601d42ec196bd
+3. 
 ```bash
 pip install -r requirements.txt
 ```
 
-<<<<<<< HEAD
 3. Make sure you have the model file:
    - The model should be in the `pickle/model.pkl` file
    - If you don't have it, you can train the model using:
@@ -161,4 +158,3 @@ Complete performance metrics are available in `results/model_results.csv`.
 - XGBoost
 - CatBoost
 - Additional requirements in requirements.txt
->>>>>>> 4da7570d1042c349eb028889f9d601d42ec196bd
