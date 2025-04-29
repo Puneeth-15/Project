@@ -118,7 +118,6 @@ The application analyzes various features of URLs including:
 
 ## Contributing
 
-Feel free to submit issues and enhancement requests!
 =======
 3. Train the detection models:
 ```bash
@@ -158,3 +157,5 @@ Complete performance metrics are available in `results/model_results.csv`.
 - XGBoost
 - CatBoost
 - Additional requirements in requirements.txt
+
+Feel free to submit issues and enhancement requests!
