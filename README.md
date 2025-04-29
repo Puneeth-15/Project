@@ -17,7 +17,6 @@ A comprehensive system for detecting phishing URLs using machine learning techni
 ## Project Structure
 
 ```
-<<<<<<< HEAD
 Phishing-URL-Detection/
 ├── app.py              # Main Flask application
 ├── feature.py          # Feature extraction module
@@ -40,6 +39,7 @@ cd Phishing-URL-Detection
 
 2. Install the required dependencies:
 =======
+```
 Phishing-Url-Detection/
 ├── src/
 │   ├── models/           # Machine learning model implementations
