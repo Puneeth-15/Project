@@ -4,7 +4,10 @@ __pycache__/
 *$py.class
 *.so
 .Python
+<<<<<<< HEAD
 env/
+=======
+>>>>>>> 4da7570d1042c349eb028889f9d601d42ec196bd
 build/
 develop-eggs/
 dist/
@@ -22,6 +25,12 @@ wheels/
 *.egg
 
 # Virtual Environment
+<<<<<<< HEAD
+=======
+.env
+.venv
+env/
+>>>>>>> 4da7570d1042c349eb028889f9d601d42ec196bd
 venv/
 ENV/
 
@@ -33,8 +42,30 @@ ENV/
 
 # OS
 .DS_Store
+<<<<<<< HEAD
 Thumbs.db
 
 # Project specific
 pickle/*.pkl
+=======
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Project specific
+pickle/
+visualizations/
+results/
+*.pkl
+*.csv
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.ico
+*.pdf
+>>>>>>> 4da7570d1042c349eb028889f9d601d42ec196bd
 *.log 

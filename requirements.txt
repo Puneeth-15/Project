@@ -9,3 +9,10 @@ scikit-learn==1.3.0
 python-whois==0.8.0
 gunicorn==21.2.0
 urllib3==2.0.7
+<<<<<<< HEAD
+=======
+matplotlib==3.7.1
+seaborn==0.12.2
+xgboost==1.7.6
+catboost==1.2.2
+>>>>>>> 4da7570d1042c349eb028889f9d601d42ec196bd
