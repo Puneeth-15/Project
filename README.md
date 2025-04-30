@@ -9,7 +9,7 @@ A machine learning-based web application that detects potential phishing URLs us
 - Threat level visualization
 - Modern and responsive UI
 - Machine learning-based detection
-=======
+
 # Phishing URL Detection System
 
 A comprehensive system for detecting phishing URLs using machine learning techniques. This project implements various algorithms to analyze URL characteristics and identify potential phishing attempts.
